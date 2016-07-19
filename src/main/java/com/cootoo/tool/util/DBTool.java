@@ -24,7 +24,7 @@ public class DBTool {
     private static Properties prop;
 
     private DBConfig dbConfig = new DBConfig();
-    private Connection conn = null;
+    private static Connection conn = null;
 
     static {
         String path = DBTool.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -39,8 +39,9 @@ public class DBTool {
         init();
     }
 
-    private synchronized void init() throws Exception {
-        logger.debug("init DBTool...");
+    private void init() throws Exception {
+        if (dbTool != null) return;
+        logger.debug("init dbTool ... ");
         if (!new File(configFile).isFile()) {
             throw new Exception("Not find the dbTool.properties in class path !");
         }
@@ -63,6 +64,7 @@ public class DBTool {
         dbConfig.username = prop.getProperty("username");
         dbConfig.password = prop.getProperty("password");
         dbConfig.dbname = prop.getProperty("dbname");
+        if (prop.getProperty("autoCommit") != null) dbConfig.autoCommit = Boolean.getBoolean(prop.getProperty("autoCommit"));
     }
 
     public Map<String, Object> getOne(String sql) {
@@ -176,7 +178,7 @@ public class DBTool {
     }
 
     /**
-     * 把 ResultSet 安装clasz装载成一个对象列表 List<clasz>
+     * 把 ResultSet 按照clasz装载成一个对象列表 List<clasz>
      * @param rs
      * @param clasz
      * @param <T>
@@ -242,7 +244,9 @@ public class DBTool {
         if (dbTool != null) return dbTool;
         else {
             try {
-                dbTool = new DBTool();
+                synchronized (DBTool.class) {
+                    dbTool = new DBTool();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

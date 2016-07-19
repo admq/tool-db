@@ -9,6 +9,8 @@ public class DBConfig {
     public String password = "root";
     public String dbname = "cootoo_doorlock";
 
+    public boolean autoCommit = true;
+
 
     public String table_prex = "";
 

@@ -10,6 +10,11 @@ import java.util.Map;
  */
 public class App {
     public static void main(String[] args) {
+        App app = new App();
+        app.testThreadSafe();
+    }
+
+    private void testDbTool() {
         DBTool dbTool = DBTool.getInstant();
         List<Map<String, Object>> list = dbTool.list("select * from tLog limit 10");
         for (Map map : list) {
@@ -32,6 +37,33 @@ public class App {
 
         Log one = dbTool.getOne("select * from tLog limit 1", Log.class);
         System.out.println(one);
+    }
 
+    private void testThreadSafe() {
+        for (int i=0; i<500; i++) {
+            new Thread(new DBThread((i+1)*100)).start();
+        }
+    }
+
+}
+
+class DBThread implements Runnable {
+    private long sleep;
+    public DBThread(long sleep) {
+        this.sleep = sleep;
+    }
+
+    @Override
+    public void run() {
+        DBTool dbTool = DBTool.getInstant();
+        List<Map<String, Object>> list = dbTool.list("select * from tLog limit 10");
+        for (Map map : list) {
+            System.out.println(String.valueOf(Thread.currentThread().getId()) + "\t-\t" + map.get("logID") + " : " + map.get("ip"));
+            try {
+                Thread.sleep(sleep);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
