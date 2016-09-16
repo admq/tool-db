@@ -1,6 +1,6 @@
 package com.cootoo.tool;
 
-import com.cootoo.tool.util.DBTool;
+import com.cootoo.tool.db.DBTool;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,8 @@ import java.util.Map;
 public class App {
     public static void main(String[] args) {
         App app = new App();
-        app.testThreadSafe();
+//        app.testThreadSafe();
+        app.testDbTool();
     }
 
     private void testDbTool() {
